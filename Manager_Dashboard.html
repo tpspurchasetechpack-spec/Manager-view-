@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#CC1F1F">
+<title>Techpack — Manager Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{--red:#CC1F1F;--rdk:#A01515;--rlt:#FDF0F0;--ylw:#F5C100;--blu:#2563EB;--blt:#DBEAFE;--grn:#16a34a;--glt:#DCFCE7;--ora:#ea580c;--bg:#EFEFEF;--wh:#fff;--g1:#F6F6F6;--g2:#E8E8E8;--g3:#C4C4C4;--g4:#888;--g5:#333;--r:12px;--sh:0 2px 14px rgba(0,0,0,.07)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--g5);min-height:100vh}
+.loverlay{position:fixed;inset:0;background:linear-gradient(135deg,#991616,var(--red));display:flex;align-items:center;justify-content:center;z-index:999;padding:20px}
+.lbox{background:var(--wh);border-radius:20px;padding:36px 30px;width:100%;max-width:360px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+.llogo{width:66px;height:66px;border-radius:50%;background:var(--ylw);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.ltitle{font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:900;color:var(--red);margin-bottom:4px}
+.lsub{font-size:12px;color:var(--g4);margin-bottom:24px}
+.pin-dots{display:flex;gap:10px;justify-content:center;margin-bottom:16px}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--g2);background:var(--g1);transition:all .2s}
+.pin-dot.filled{background:var(--red);border-color:var(--red)}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.npbtn{padding:16px;border:1.5px solid var(--g2);border-radius:10px;background:var(--g1);font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:var(--g5);cursor:pointer;transition:all .15s;-webkit-appearance:none}
+.npbtn:active{background:var(--red);color:#fff;border-color:var(--red);transform:scale(.95)}
+.npbtn.del{background:var(--rlt);color:var(--red);border-color:transparent;font-size:16px}
+.npbtn.go{background:var(--red);color:#fff;border-color:var(--red)}
+.lerr{color:var(--red);font-size:12px;font-weight:600;margin-top:10px;min-height:18px}
+.lhint{font-size:10px;color:var(--g3);margin-top:10px}
+.hdr{background:linear-gradient(135deg,#991616,var(--red));position:sticky;top:0;z-index:90;box-shadow:0 3px 20px rgba(0,0,0,.22)}
+.hdr-in{display:flex;align-items:center;gap:13px;padding:11px 22px;max-width:1300px;margin:0 auto}
+.logo{width:42px;height:42px;border-radius:50%;background:var(--ylw);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bname{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:#fff;letter-spacing:1px;line-height:1}
+.bsub{font-size:9px;color:rgba(255,255,255,.7)}
+.hdr-r{margin-left:auto;display:flex;align-items:center;gap:12px}
+.hclk{font-size:16px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums}
+.hdate{font-size:9px;color:rgba(255,255,255,.65);text-align:right}
+.rbtn{padding:6px 13px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:20px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'Barlow',sans-serif}
+.gs-btn{padding:6px 13px;background:rgba(255,255,255,.9);border:none;border-radius:20px;color:var(--red);font-size:11px;font-weight:700;cursor:pointer;font-family:'Barlow',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.mgr-tag{padding:5px 12px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);border-radius:20px;color:#fff;font-size:10px;font-weight:700;letter-spacing:.5px}
+.main{max-width:1300px;margin:0 auto;padding:18px 22px}
+.metrics{display:grid;grid-template-columns:repeat(7,1fr);gap:11px;margin-bottom:18px}
+.mc{background:var(--wh);border-radius:var(--r);box-shadow:var(--sh);padding:13px 15px;position:relative;overflow:hidden}
+.mc::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.mc.tot::after{background:var(--g3)}.mc.prs::after{background:var(--grn)}.mc.abs::after{background:var(--red)}.mc.lat::after{background:var(--ylw)}.mc.pen::after{background:var(--ora)}.mc.don::after{background:var(--blu)}
+.mn{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:900;line-height:1;margin-bottom:1px}
+.tot .mn{color:var(--g5)}.prs .mn{color:var(--grn)}.abs .mn{color:var(--red)}.lat .mn{color:#b45309}.pen .mn{color:var(--ora)}.don .mn{color:var(--blu)}
+.ml{font-size:10px;font-weight:700;color:var(--g4)}
+.mb{height:3px;background:var(--g2);border-radius:2px;margin-top:7px;overflow:hidden}
+.mbf{height:100%;border-radius:2px;transition:width .7s}
+.prs .mbf{background:var(--grn)}.abs .mbf{background:var(--red)}.lat .mbf{background:var(--ylw)}.pen .mbf{background:var(--ora)}.don .mbf{background:var(--blu)}
+.layout{display:grid;grid-template-columns:250px 1fr;gap:15px}
+.sidebar{display:flex;flex-direction:column;gap:13px}
+.card{background:var(--wh);border-radius:var(--r);box-shadow:var(--sh);padding:15px}
+.cttl{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;margin-bottom:11px}
+.srow{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:.5px solid var(--g2)}
+.srow:last-child{border:none}
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sname{font-size:12px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.snums{font-size:11px;color:var(--g4)}.spct{font-size:12px;font-weight:800}
+.fld{margin-bottom:10px}
+.lbl{font-size:10px;font-weight:700;color:var(--g4);display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px}
+.inp{width:100%;padding:8px 10px;border:1.5px solid var(--g2);border-radius:7px;font-family:'Barlow',sans-serif;font-size:13px;color:var(--g5);background:var(--g1);outline:none;transition:border .2s;-webkit-appearance:none;appearance:none}
+.inp:focus{border-color:var(--red);background:var(--wh)}
+select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7'%3E%3Cpath d='M0 0l5 6 5-6' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:26px}
+.abtn{width:100%;padding:9px;background:var(--red);color:#fff;border:none;border-radius:7px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.5px;margin-top:3px}
+.abtn:active{opacity:.85}
+.abtn.grn{background:var(--grn)}
+.abtn.blu{background:var(--blu)}
+.abtn.ora{background:var(--ora)}
+.fitem{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:.5px solid var(--g2)}
+.fitem:last-child{border:none}
+.fdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.fdot.p{background:var(--grn)}.fdot.a{background:var(--red)}.fdot.l{background:var(--ylw)}
+.tabs{display:flex;gap:3px;background:var(--wh);border-radius:var(--r);padding:4px;box-shadow:var(--sh);margin-bottom:13px;width:fit-content}
+.tab{padding:8px 16px;border:none;background:none;font-family:'Barlow',sans-serif;font-size:12px;font-weight:700;cursor:pointer;color:var(--g4);border-radius:8px;transition:all .2s}
+.tab.on{background:var(--red);color:#fff}
+.tab:hover:not(.on){background:var(--g1);color:var(--g5)}
+.pane{display:none}.pane.on{display:block}
+.filters{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.filters .inp{flex:1;min-width:110px;padding:8px 10px;background:var(--wh)}
+.lgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:11px}
+.ec{background:var(--wh);border-radius:var(--r);box-shadow:var(--sh);padding:13px;border-left:4px solid var(--g3);transition:transform .15s}
+.ec:hover{transform:translateY(-2px)}
+.ec.p{border-left-color:var(--grn)}.ec.a{border-left-color:var(--red)}.ec.d{border-left-color:var(--blu)}.ec.l{border-left-color:var(--ylw)}
+.echd{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.ava{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;flex-shrink:0}
+.ava.p{background:var(--glt);color:var(--grn)}.ava.a{background:var(--rlt);color:var(--red)}.ava.d{background:var(--blt);color:var(--blu)}.ava.l{background:#FEF9C3;color:#92400E}
+.ename{font-size:13px;font-weight:700;line-height:1.2}.esite{font-size:10px;color:var(--g4)}
+.estat{margin-left:auto;font-size:10px;font-weight:800;letter-spacing:.4px;flex-shrink:0}
+.ep{color:var(--grn)}.ea{color:var(--red)}.ed{color:var(--blu)}.el{color:#92400E}
+.pills{display:flex;flex-wrap:wrap;gap:3px}
+.pill{padding:2px 7px;border-radius:9px;font-size:9px;font-weight:700}
+.pt{background:var(--g1);color:var(--g5)}.pg{background:var(--glt);color:var(--grn)}.pl{background:#FEF9C3;color:#92400E}.pn{background:var(--rlt);color:var(--red)}.pd{background:var(--blt);color:var(--blu)}.pbon{background:#F3E8FF;color:#7C3AED}
+.twrap{overflow-x:auto;background:var(--wh);border-radius:var(--r);box-shadow:var(--sh)}
+table{width:100%;border-collapse:collapse;font-size:11px;min-width:800px}
+thead th{background:var(--red);color:#fff;padding:9px 6px;text-align:center;font-weight:700;white-space:nowrap;position:sticky;top:0}
+thead th:nth-child(1),thead th:nth-child(2),thead th:nth-child(3){text-align:left;padding-left:10px}
+tbody td{padding:7px 5px;border-bottom:.5px solid var(--g2);text-align:center}
+tbody td:nth-child(1){padding-left:10px;color:var(--g4);font-size:10px}
+tbody td:nth-child(2){font-size:10px;color:var(--g4);text-align:left;white-space:nowrap}
+tbody td:nth-child(3){font-weight:600;text-align:left;padding-left:8px;white-space:nowrap}
+tbody tr:hover td{background:var(--rlt)}
+.cp{color:var(--grn);font-weight:700}.ca{color:var(--red);font-weight:700}.cl{color:#b45309}.cw{color:var(--g3)}
+.pph{color:var(--grn);font-weight:800}.ppm{color:#b45309;font-weight:800}.ppl{color:var(--red);font-weight:800}
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:13px}
+.brow{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.blbl{font-size:11px;color:var(--g5);width:90px;flex-shrink:0;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btr{flex:1;height:20px;background:var(--g1);border-radius:4px;overflow:hidden}
+.bfl{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:7px;font-size:10px;font-weight:700;color:#fff;min-width:24px;transition:width .8s}
+.bpct{font-size:11px;font-weight:700;width:34px;text-align:right;flex-shrink:0}
+.snums{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+.sn{background:var(--g1);border-radius:8px;padding:10px;text-align:center}
+.snv{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;line-height:1}
+.snl{font-size:9px;color:var(--g4);margin-top:2px}
+
+/* Modal overlay */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center;padding:20px}
+.modal-bg.show{display:flex}
+.modal{background:var(--wh);border-radius:16px;padding:24px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--g4);padding:0 4px}
+.modal-close:hover{color:var(--red)}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.status-btn{padding:10px;border:2px solid var(--g2);border-radius:8px;background:var(--g1);font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;text-align:center}
+.status-btn.sel-present{background:var(--glt);border-color:var(--grn);color:var(--grn)}
+.status-btn.sel-absent{background:var(--rlt);border-color:var(--red);color:var(--red)}
+.status-btn.sel-late{background:#FEF9C3;border-color:#b45309;color:#b45309}
+
+.toast{position:fixed;bottom:20px;right:20px;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.2);transform:translateY(80px);opacity:0;transition:all .3s;z-index:200;max-width:320px}
+.toast.ok{background:var(--glt);color:var(--grn);border:1px solid #86EFAC}.toast.er{background:var(--rlt);color:var(--red);border:1px solid #FCA5A5}.toast.in{background:var(--blt);color:var(--blu);border:1px solid #93C5FD}
+.toast.on{transform:translateY(0);opacity:1}
+.empty{text-align:center;padding:30px;color:var(--g4);font-size:13px}
+.skel{background:linear-gradient(90deg,var(--g2) 25%,var(--g1) 50%,var(--g2) 75%);background-size:200%;animation:sk 1.4s infinite;border-radius:6px;height:54px;margin-bottom:8px}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{display:none}.metrics{grid-template-columns:repeat(3,1fr)}.main{padding:12px}.agrid{grid-template-columns:1fr}}
+/* Guest Alert Panel */
+.guest-panel{background:var(--wh);border-radius:var(--r);box-shadow:var(--sh);padding:15px;border-top:3px solid #F5C100}
+.guest-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--red);color:#fff;border-radius:50%;min-width:18px;height:18px;font-size:10px;font-weight:900;margin-left:6px;padding:0 3px;animation:pulse-badge 1.5s infinite}
+@keyframes pulse-badge{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.galert{border:1.5px solid #F5C100;border-radius:9px;padding:10px 11px;margin-bottom:8px;background:#FFFBEB;position:relative}
+.galert:last-child{margin-bottom:0}
+.galert-name{font-size:12px;font-weight:700;color:var(--g5)}
+.galert-meta{font-size:10px;color:var(--g4);margin-top:2px;margin-bottom:7px;line-height:1.5}
+.galert-btns{display:flex;gap:5px}
+.ga-approve{flex:1;padding:5px;border:none;border-radius:6px;background:var(--glt);color:var(--grn);font-size:10px;font-weight:800;cursor:pointer;font-family:'Barlow',sans-serif}
+.ga-approve:active{background:var(--grn);color:#fff}
+.ga-maps{flex:1;padding:5px;border:none;border-radius:6px;background:var(--blt);color:var(--blu);font-size:10px;font-weight:800;cursor:pointer;font-family:'Barlow',sans-serif;text-decoration:none;display:flex;align-items:center;justify-content:center}
+.ga-dismiss{padding:5px 8px;border:none;border-radius:6px;background:var(--rlt);color:var(--red);font-size:10px;font-weight:800;cursor:pointer;font-family:'Barlow',sans-serif}
+.notif-dot{position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:var(--red);border:2px solid var(--red);display:none}
+.notif-dot.show{display:block;animation:pulse-badge .8s infinite}
+.guest-panel{background:var(--wh);border-radius:var(--r);box-shadow:var(--sh);padding:15px;border-top:3px solid #F5C100}
+.guest-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:900;margin-left:6px;flex-shrink:0;animation:pulse-badge 1.5s infinite}
+@keyframes pulse-badge{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.galert{border:1.5px solid #F5C100;border-radius:9px;padding:10px 11px;margin-bottom:8px;background:#FFFBEB;position:relative}
+.galert:last-child{margin-bottom:0}
+.galert-name{font-size:12px;font-weight:700;color:var(--g5)}
+.galert-meta{font-size:10px;color:var(--g4);margin-top:2px;margin-bottom:7px;line-height:1.5}
+.galert-btns{display:flex;gap:5px}
+.ga-approve{flex:1;padding:5px;border:none;border-radius:6px;background:var(--glt);color:var(--grn);font-size:10px;font-weight:800;cursor:pointer;font-family:'Barlow',sans-serif}
+.ga-approve:active{background:var(--grn);color:#fff}
+.ga-maps{flex:1;padding:5px;border:none;border-radius:6px;background:var(--blt);color:var(--blu);font-size:10px;font-weight:800;cursor:pointer;font-family:'Barlow',sans-serif;text-decoration:none;display:flex;align-items:center;justify-content:center}
+.ga-dismiss{padding:5px 8px;border:none;border-radius:6px;background:var(--rlt);color:var(--red);font-size:10px;font-weight:800;cursor:pointer;font-family:'Barlow',sans-serif}
+@keyframes slideIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulse{from{opacity:1}to{opacity:.3}}
+.ntab-wrap{position:relative;display:inline-block}
+.notif-dot{position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:var(--red);border:2px solid #fff;display:none}
+.notif-dot.show{display:block}
+
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="loverlay" id="login">
+  <div class="lbox">
+    <div class="llogo">
+      <img src="data:image/jpeg;base64,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" width="40" height="40" style="border-radius:50%;object-fit:cover" alt="Techpack">
+    </div>
+    <div class="ltitle">TECHPACK</div>
+    <div class="lsub">Manager Dashboard &mdash; Enter PIN</div>
+    <div class="pin-dots" id="pin-dots">
+      <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="numpad">
+      <button class="npbtn" onclick="pk('1')">1</button><button class="npbtn" onclick="pk('2')">2</button><button class="npbtn" onclick="pk('3')">3</button>
+      <button class="npbtn" onclick="pk('4')">4</button><button class="npbtn" onclick="pk('5')">5</button><button class="npbtn" onclick="pk('6')">6</button>
+      <button class="npbtn" onclick="pk('7')">7</button><button class="npbtn" onclick="pk('8')">8</button><button class="npbtn" onclick="pk('9')">9</button>
+      <button class="npbtn del" onclick="pd()">&#9003;</button><button class="npbtn" onclick="pk('0')">0</button><button class="npbtn go" onclick="ps()">&#10003;</button>
+    </div>
+    <div class="lerr" id="lerr"></div>
+    <div class="lhint">Default PIN: 1234</div>
+  </div>
+</div>
+
+<!-- MANUAL ATTENDANCE MODAL -->
+<div class="modal-bg" id="att-modal">
+  <div class="modal">
+    <div class="modal-title">
+      Mark Attendance Manually
+      <button class="modal-close" onclick="closeModal('att-modal')">&#10005;</button>
+    </div>
+    <div class="fld">
+      <label class="lbl">Employee Name</label>
+      <select id="mat-emp" class="inp">
+        <option value="">Select employee...</option>
+      </select>
+    </div>
+    <div class="fld">
+      <label class="lbl">Date</label>
+      <input type="date" id="mat-date" class="inp">
+    </div>
+    <div class="fld">
+      <label class="lbl">Status</label>
+      <div class="status-grid">
+        <button class="status-btn" id="sb-present" onclick="selStatus('present')">&#10003; Present</button>
+        <button class="status-btn" id="sb-absent"  onclick="selStatus('absent')">&#10007; Absent</button>
+        <button class="status-btn" id="sb-late"    onclick="selStatus('late')">&#9201; Late</button>
+      </div>
+    </div>
+    <div class="fld r2">
+      <div>
+        <label class="lbl">Check-in Time</label>
+        <input type="time" id="mat-cin" class="inp">
+      </div>
+      <div>
+        <label class="lbl">Check-out Time</label>
+        <input type="time" id="mat-cout" class="inp">
+      </div>
+    </div>
+    <div class="fld">
+      <label class="lbl">Reason / Note</label>
+      <input type="text" id="mat-note" class="inp" placeholder="e.g. Field visit, Training, WFH...">
+    </div>
+    <button class="abtn grn" onclick="submitManualAtt()">&#10003; SAVE ATTENDANCE</button>
+  </div>
+</div>
+
+<!-- BONUS MODAL -->
+<div class="modal-bg" id="bon-modal">
+  <div class="modal">
+    <div class="modal-title">
+      Add Bonus / Deduction
+      <button class="modal-close" onclick="closeModal('bon-modal')">&#10005;</button>
+    </div>
+    <div class="fld">
+      <label class="lbl">Employee Name</label>
+      <select id="bon-emp" class="inp">
+        <option value="">Select employee...</option>
+      </select>
+    </div>
+    <div class="fld r2">
+      <div>
+        <label class="lbl">Month</label>
+        <input type="month" id="bon-month" class="inp">
+      </div>
+      <div>
+        <label class="lbl">Type</label>
+        <select id="bon-type" class="inp">
+          <option value="bonus">Bonus &#43;</option>
+          <option value="deduction">Deduction &#8722;</option>
+        </select>
+      </div>
+    </div>
+    <div class="fld">
+      <label class="lbl">Amount (&#8377;)</label>
+      <input type="number" id="bon-amt" class="inp" placeholder="Enter amount" min="0">
+    </div>
+    <div class="fld">
+      <label class="lbl">Reason</label>
+      <input type="text" id="bon-reason" class="inp" placeholder="e.g. Performance bonus, Festival bonus, Advance deduction...">
+    </div>
+    <button class="abtn ora" onclick="submitBonus()">&#10003; SAVE BONUS / DEDUCTION</button>
+  </div>
+</div>
+
+<!-- SYNC BONUS TO SALARY MODAL -->
+<div class="modal-bg" id="sync-modal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title">
+      &#128257; Apply Bonus to Monthly Salary
+      <button class="modal-close" onclick="closeModal('sync-modal')">&#10005;</button>
+    </div>
+
+    <!-- Step 1: Select month -->
+    <div style="background:var(--color-background-secondary);border-radius:10px;padding:14px;margin-bottom:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--color-text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Step 1 — Select month</div>
+      <input type="month" id="sync-month" class="inp" style="margin-bottom:8px">
+      <button onclick="loadBonusPreview()" style="width:100%;padding:9px;border-radius:7px;border:none;background:var(--color-background-primary);border:0.5px solid var(--color-border-secondary);font-family:'Barlow',sans-serif;font-size:13px;font-weight:600;cursor:pointer;color:var(--color-text-primary)">&#128269; Load Bonus Entries</button>
+    </div>
+
+    <!-- Preview list -->
+    <div id="sync-preview" style="display:none;margin-bottom:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--color-text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Step 2 — Review entries</div>
+      <div id="sync-list" style="border:0.5px solid var(--color-border-tertiary);border-radius:8px;max-height:220px;overflow-y:auto"></div>
+      <div id="sync-summary" style="margin-top:8px;padding:10px 12px;background:var(--color-background-secondary);border-radius:8px;font-size:13px"></div>
+    </div>
+
+    <!-- No entries message -->
+    <div id="sync-empty" style="display:none;padding:12px;background:var(--color-background-warning);border:0.5px solid var(--color-border-warning);border-radius:8px;font-size:13px;color:var(--color-text-warning);margin-bottom:12px">
+      &#9888; No bonus entries found for this month. Please add bonus first using the Add Bonus button.
+    </div>
+
+    <!-- Apply button -->
+    <div id="sync-actions" style="display:none">
+      <div style="font-size:12px;font-weight:700;color:var(--color-text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Step 3 — Apply to salary sheet</div>
+      <button id="sync-apply-btn" onclick="applyBonusToSalary()" style="width:100%;padding:12px;border-radius:8px;border:none;background:#7C3AED;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;letter-spacing:1px;cursor:pointer">&#128257; APPLY BONUS TO MONTHLY SALARY</button>
+      <div style="font-size:11px;color:var(--color-text-tertiary);text-align:center;margin-top:6px">A "Bonus (&#8377;)" column will be added next to Net Payable in Monthly_Salary sheet</div>
+    </div>
+
+    <!-- Result -->
+    <div id="sync-result" style="display:none;margin-top:10px;padding:14px;background:var(--color-background-success);border:0.5px solid var(--color-border-success);border-radius:8px;font-size:13px;color:var(--color-text-success);line-height:1.7"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+  <div class="hdr">
+    <div class="hdr-in">
+      <div class="logo">
+        <img src="data:image/jpeg;base64,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" width="28" height="28" style="border-radius:50%;object-fit:cover" alt="Techpack">
+      </div>
+      <div><div class="bname">TECHPACK ATTENDANCE</div><div class="bsub">Manager Dashboard</div></div>
+      <div class="hdr-r">
+        <div><div class="hclk" id="hclk">--:--:--</div><div class="hdate" id="hdate">---</div></div>
+        <a class="gs-btn" id="sheet-link" href="#" target="_blank">&#128202; Open Sheet</a>
+        <button class="rbtn" onclick="refreshAll()" style="position:relative">&#8635; Refresh<span class="notif-dot" id="notif-dot"></span></button>
+        <div class="mgr-tag">MANAGER</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="metrics">
+      <div class="mc tot"><div class="mn" id="m-tot">76</div><div class="ml">Total Employees</div></div>
+      <div class="mc prs"><div class="mn" id="m-prs">0</div><div class="ml">Present</div><div class="mb"><div class="mbf" id="mb-p" style="width:0%"></div></div></div>
+      <div class="mc abs"><div class="mn" id="m-abs">76</div><div class="ml">Not Checked In</div><div class="mb"><div class="mbf" id="mb-a" style="width:100%"></div></div></div>
+      <div class="mc lat"><div class="mn" id="m-lat">0</div><div class="ml">Late Today</div><div class="mb"><div class="mbf" id="mb-l" style="width:0%"></div></div></div>
+      <div class="mc pen"><div class="mn" id="m-pen">0</div><div class="ml">Pending Checkout</div><div class="mb"><div class="mbf" id="mb-pe" style="width:0%"></div></div></div>
+      <div class="mc don"><div class="mn" id="m-don">0</div><div class="ml">Day Complete</div><div class="mb"><div class="mbf" id="mb-d" style="width:0%"></div></div></div>
+      <div class="mc" style="border-top:3px solid #F5C100"><div class="mn" id="m-gst" style="color:#92400E">0</div><div class="ml" style="color:#92400E">Guest Location</div></div>
+    </div>
+
+    <div class="layout">
+      <div class="sidebar">
+        <div class="card"><div class="cttl">&#128205; Site Status</div><div id="site-ov"><div class="empty" style="padding:10px;font-size:12px">Loading...</div></div></div>
+
+        <!-- GUEST LOCATION ALERTS -->
+        <div class="guest-panel" id="guest-panel" style="display:none">
+          <div class="cttl" style="display:flex;align-items:center">
+            ⚠️ Guest Location Alerts
+            <span class="guest-badge" id="guest-badge">0</span>
+          </div>
+          <div id="guest-list"><div class="empty" style="padding:6px;font-size:11px">No pending alerts</div></div>
+        </div>
+
+        <!-- MANAGER ACTIONS -->
+        <div class="card">
+          <div class="cttl">&#128221; Manager Actions</div>
+          <button class="abtn grn" style="margin-bottom:8px" onclick="openModal('att-modal')">&#10003; Mark Attendance Manually</button>
+          <button class="abtn ora" style="margin-bottom:8px" onclick="openModal('bon-modal')">&#11088; Add Bonus / Deduction</button>
+          <button class="abtn" style="background:#7C3AED;margin-bottom:0" onclick="openModal('sync-modal')">&#128257; Apply Bonus to Salary</button>
+        </div>
+
+        <!-- ADD EMPLOYEE -->
+        <div class="card">
+          <div class="cttl">+ Add Employee</div>
+          <div class="fld"><label class="lbl">Full Name</label><input type="text" id="add-n" class="inp" placeholder="Employee name"></div>
+          <div class="fld"><label class="lbl">Site</label>
+            <select id="add-s" class="inp">
+              <option value="">Select site...</option>
+              <option>NORTH 1</option><option>NORTH 2</option><option>NORTH 3</option><option>NORTH 4</option><option>NORTH 5</option><option>NORTH 6</option>
+              <option>SOUTH 1</option><option>SOUTH 3</option><option>SOUTH 4</option><option>SOUTH 5</option><option>SOUTH 6</option><option>SOUTH 7</option>
+              <option>HYD 1</option><option>CORPORATE</option><option>FACTORY</option>
+            </select>
+          </div>
+          <button class="abtn" onclick="addEmp()">+ ADD EMPLOYEE</button>
+        </div>
+        <div class="card"><div class="cttl">&#128225; Recent Activity</div><div id="feed"><div class="empty" style="padding:10px;font-size:12px">Loading...</div></div></div>
+      </div>
+
+      <div>
+        <div class="tabs">
+          <button class="tab on" onclick="sw('lv',this)">Live Status</button>
+          <button class="tab" onclick="sw('rg',this)">Register</button>
+          <button class="tab" onclick="sw('an',this)">Analytics</button>
+          <button class="tab" onclick="sw('loc',this)" id="loc-tab">&#128205; Live Location</button>
+        </div>
+
+        <div id="lv" class="pane on">
+          <div class="filters">
+            <input type="text" class="inp" id="lq" placeholder="&#128269; Search employee..." oninput="renderLive()">
+            <select class="inp" id="lsite" onchange="renderLive()">
+              <option value="">All sites</option>
+              <option>NORTH 1</option><option>NORTH 2</option><option>NORTH 3</option><option>NORTH 4</option><option>NORTH 5</option><option>NORTH 6</option>
+              <option>SOUTH 1</option><option>SOUTH 3</option><option>SOUTH 4</option><option>SOUTH 5</option><option>SOUTH 6</option><option>SOUTH 7</option>
+              <option>HYD 1</option><option>CORPORATE</option><option>FACTORY</option>
+            </select>
+            <select class="inp" id="lstatus" onchange="renderLive()">
+              <option value="">All statuses</option>
+              <option value="present">Present</option>
+              <option value="absent">Absent</option>
+              <option value="done">Day Complete</option>
+              <option value="late">Late</option>
+              <option value="notin">Not Checked In</option>
+            </select>
+          </div>
+          <div class="lgrid" id="lgrid"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+        </div>
+
+        <div id="rg" class="pane">
+          <div class="filters">
+            <input type="text" class="inp" id="rq" placeholder="&#128269; Search..." oninput="filterReg()">
+            <select class="inp" id="rsite" onchange="filterReg()">
+              <option value="">All sites</option>
+              <option>NORTH 1</option><option>NORTH 2</option><option>NORTH 3</option><option>NORTH 4</option><option>NORTH 5</option><option>NORTH 6</option>
+              <option>SOUTH 1</option><option>SOUTH 3</option><option>SOUTH 4</option><option>SOUTH 5</option><option>SOUTH 6</option><option>SOUTH 7</option>
+              <option>HYD 1</option><option>CORPORATE</option><option>FACTORY</option>
+            </select>
+          </div>
+          <div class="twrap">
+            <table>
+              <thead><tr>
+                <th>#</th><th>Site</th><th>Employee</th>
+                <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th>
+                <th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th><th>19</th><th>20</th>
+                <th>21</th><th>22</th><th>23</th><th>24</th><th>25</th><th>26</th><th>27</th><th>28</th><th>29</th><th>30</th><th>31</th>
+                <th style="background:#A01515">P</th><th style="background:#A01515">A</th><th style="background:#A01515">L</th><th style="background:#A01515">%</th>
+              </tr></thead>
+              <tbody id="rtbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="an" class="pane">
+          <div class="agrid">
+            <div class="card"><div class="cttl">Today &mdash; by site</div><div id="an-site"><div class="empty">No check-ins yet</div></div></div>
+            <div class="card"><div class="cttl">Today &mdash; overview</div><div id="an-ov"></div></div>
+          </div>
+          <div class="card">
+            <div class="cttl">All employees &mdash; current month</div>
+            <div id="an-emp" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:7px;margin-top:8px"></div>
+          </div>
+        </div>
+
+        <!-- LIVE LOCATION TAB -->
+        <div id="loc" class="pane">
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+            <div style="font-size:13px;color:var(--g4);flex:1">Shows GPS location of all employees who checked in today. Tap 📍 to open in Google Maps.</div>
+            <a id="all-maps-btn" href="#" target="_blank" style="padding:8px 14px;background:var(--blu);color:#fff;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap">🗺 View All on Map</a>
+          </div>
+          <!-- Guest alerts inline -->
+          <div id="loc-guest-panel" style="display:none;background:#FFFBEB;border:1.5px solid #F5C100;border-radius:var(--r);padding:14px;margin-bottom:12px">
+            <div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:10px">⚠ Guest Location Alerts — employees checked in from outside work zone</div>
+            <div id="loc-guest-list"></div>
+          </div>
+          <div id="loc-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">
+            <div class="empty">Load live status first — click Refresh</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GUEST POPUP NOTIFICATION -->
+<div id="guest-popup" style="display:none;position:fixed;top:80px;right:20px;z-index:300;width:320px;background:#fff;border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,.22);border:2px solid #F5C100;overflow:hidden">
+  <div style="background:#F5C100;padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+    <div style="font-weight:700;font-size:13px;color:#1a1a1a">⚠ New Guest Location Alert</div>
+    <button onclick="closeGuestPopup()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#1a1a1a;line-height:1">×</button>
+  </div>
+  <div id="guest-popup-body" style="padding:12px 14px;max-height:300px;overflow-y:auto"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const MANAGER_PIN = "1234";
+const SCRIPT_URL  = "https://script.google.com/macros/s/AKfycbzcT7p-T3CmhzSyjd1XOC1Xqt9EiA8TvCj1zJ34DAUXYxBQW4XiSBR6xe6lhpNKDopkcQ/exec";
+const SHEET_URL   = "https://docs.google.com/spreadsheets/d/1DMKvAVAaJL2QT1AEKevUr0vCbROj7-HVLYnMntCiyHI/edit";
+
+const COLORS=["#CC1F1F","#2563EB","#16a34a","#F5C100","#7C3AED","#EA580C","#0891B2","#DB2777","#65A30D","#0D9488"];
+const EMP_DATA=[
+  {name:"Koshle",site:"NORTH 6"},{name:"Choudhary",site:"NORTH 6"},{name:"BHAGATH",site:"NORTH 6"},
+  {name:"Chavan",site:"NORTH 5"},{name:"Tejveer Singh",site:"NORTH 5"},{name:"Narender kumar Bhati",site:"NORTH 5"},{name:"Dheeraj Singh",site:"NORTH 5"},{name:"VIKASH KUMAR",site:"NORTH 5"},
+  {name:"Pushepender",site:"NORTH 1"},{name:"Anuj",site:"NORTH 1"},{name:"Sudheer",site:"NORTH 1"},{name:"Sukhveer singh",site:"NORTH 1"},{name:"Manish",site:"NORTH 1"},{name:"Kapil",site:"NORTH 1"},{name:"Yogesh",site:"NORTH 1"},{name:"Tushar singh",site:"NORTH 1"},
+  {name:"Manoj",site:"NORTH 2"},{name:"Kamalesh",site:"NORTH 2"},{name:"ANKIT",site:"NORTH 2"},{name:"NARAYAN SAHOO",site:"NORTH 2"},
+  {name:"Sundar prasad",site:"NORTH 3"},{name:"Aazad",site:"NORTH 3"},{name:"Akash Rajput",site:"NORTH 3"},{name:"KISHORE KUMAR",site:"NORTH 3"},
+  {name:"RAHUL MUDGAL",site:"NORTH 4"},{name:"VISHAL",site:"NORTH 4"},{name:"Ravi",site:"NORTH 4"},
+  {name:"KARIMULLA",site:"HYD 1"},{name:"RAJIV",site:"HYD 1"},{name:"SACHIN YADAV",site:"HYD 1"},{name:"PRADYUMN",site:"HYD 1"},{name:"SURYA KANTH PRADHAN",site:"HYD 1"},{name:"SHAIK MOHAMMED ASAD",site:"HYD 1"},{name:"MUKHESH",site:"HYD 1"},{name:"BADRINATH",site:"HYD 1"},{name:"NARAYANAN",site:"HYD 1"},{name:"AJAY",site:"HYD 1"},{name:"SUDERSHAN",site:"HYD 1"},{name:"P SHIVA",site:"HYD 1"},{name:"Mohit",site:"HYD 1"},
+  {name:"LOKESH SALADI",site:"SOUTH 1"},{name:"NAVEEN",site:"SOUTH 1"},{name:"K.DURGA PRASAD",site:"SOUTH 1"},{name:"VENKATASUBBAIAH",site:"SOUTH 1"},
+  {name:"M.S VERMA",site:"SOUTH CORP"},
+  {name:"VISHAL BABU",site:"SOUTH 6"},{name:"D.SIVA",site:"SOUTH 6"},{name:"D.SIVA SANKAR",site:"SOUTH 6"},{name:"CHANDRAMOULI",site:"SOUTH 6"},{name:"SRINIVAASULU",site:"SOUTH 6"},
+  {name:"ARJUN BISWAS",site:"SOUTH 5"},{name:"AKASH BISWAS",site:"SOUTH 5"},{name:"BHANU PRABAS",site:"SOUTH 5"},{name:"BIKRAM NOMOSUDRO",site:"SOUTH 5"},{name:"K.BALAJI",site:"SOUTH 5"},
+  {name:"MANI",site:"SOUTH 4"},{name:"GURAVAIAH",site:"SOUTH 4"},{name:"RAJA",site:"SOUTH 4"},
+  {name:"RAJ KUMAR",site:"SOUTH 7"},{name:"MURALI KRISHNA",site:"SOUTH 7"},
+  {name:"ANJANEYULU",site:"SOUTH 3"},{name:"PANKAJ",site:"SOUTH 3"},
+  {name:"PRIYA",site:"CORPORATE"},{name:"KRISHNAM RAJU",site:"CORPORATE"},{name:"RAJESH KUMAR",site:"CORPORATE"},{name:"RAMBABU",site:"CORPORATE"},{name:"BHAVYA",site:"CORPORATE"},{name:"SREELATHA",site:"CORPORATE"},{name:"Saiganesh",site:"CORPORATE"},{name:"KS VERMA",site:"CORPORATE"},{name:"PRASANTH",site:"CORPORATE"},{name:"D Hema",site:"CORPORATE"},
+  {name:"SANIL",site:"FACTORY"},{name:"AZAD KUMAR",site:"FACTORY"},{name:"SRINU",site:"FACTORY"},{name:"Sita Devi",site:"FACTORY"},
+];
+
+let todayRecs=[], selStatus_val="present";
+
+// ── PIN ──────────────────────────────────────────────────
+let pinVal="";
+function pk(k){if(pinVal.length>=4)return;pinVal+=k;ud();if(pinVal.length===MANAGER_PIN.length)setTimeout(ps,200);}
+function pd(){pinVal=pinVal.slice(0,-1);ud();}
+function ud(){for(let i=0;i<4;i++){const d=document.getElementById("pd"+i);if(d)d.className="pin-dot"+(i<pinVal.length?" filled":"");}}
+function ps(){
+  if(pinVal===MANAGER_PIN){
+    document.getElementById("login").style.display="none";
+    document.getElementById("app").style.display="block";
+    document.getElementById("sheet-link").href=SHEET_URL;
+    init();
+  }else{
+    document.getElementById("lerr").textContent="Wrong PIN. Try again.";
+    pinVal="";ud();setTimeout(()=>document.getElementById("lerr").textContent="",2000);
+  }
+}
+
+// ── CLOCK ─────────────────────────────────────────────────
+function tick(){
+  const n=new Date(),pad=v=>String(v).padStart(2,"0");
+  document.getElementById("hclk").textContent=`${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
+  const days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],mons=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  document.getElementById("hdate").textContent=`${days[n.getDay()]} ${n.getDate()} ${mons[n.getMonth()]} ${n.getFullYear()}`;
+}
+setInterval(tick,1000);tick();
+
+// ── TABS ──────────────────────────────────────────────────
+function sw(id,btn){
+  document.querySelectorAll(".tab").forEach(b=>b.classList.remove("on"));
+  document.querySelectorAll(".pane").forEach(p=>p.classList.remove("on"));
+  btn.classList.add("on");document.getElementById(id).classList.add("on");
+  if(id==="an")renderAnalytics();
+  if(id==="rg")loadAndRenderReg();
+  if(id==="loc")renderLiveLocation();
+}
+
+// ── API ───────────────────────────────────────────────────
+async function apiGet(params){
+  const url=SCRIPT_URL+"?"+new URLSearchParams(params);
+  const r=await fetch(url);if(!r.ok)throw new Error(r.statusText);
+  return r.json();
+}
+async function apiPost(data){
+  const r=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(data)});
+  if(!r.ok)throw new Error(r.statusText);return r.json();
+}
+
+async function loadToday(){
+  try{todayRecs=await apiGet({action:"getToday"});return todayRecs;}
+  catch(e){toast("Sheet error: "+e.message,"er");return[];}
+}
+
+function updateMetrics(){
+  const total=EMP_DATA.length;
+  const present=todayRecs.filter(r=>r.status==="present").length;
+  const late=todayRecs.filter(r=>r.is_late===true||r.is_late==="TRUE").length;
+  const done=todayRecs.filter(r=>r.checkout_time).length;
+  const checkins=todayRecs.length;
+  const pending=Math.max(0,present-done);
+  const notIn=total-checkins;
+  const guest=todayRecs.filter(r=>r.guest_location===true||r.guest_location==="YES"||r.guest_location==="true").length;
+  const s=(id,v)=>document.getElementById(id).textContent=v;
+  const b=(id,v)=>document.getElementById(id).style.width=Math.round(v/total*100)+"%";
+  s("m-tot",total);s("m-prs",present);s("m-abs",notIn);s("m-lat",late);s("m-pen",pending);s("m-don",done);s("m-gst",guest);
+  b("mb-p",present);b("mb-a",notIn);b("mb-l",late);b("mb-pe",pending);b("mb-d",done);
+  // Show notification dot if there are guest alerts
+  const nd=document.getElementById("notif-dot");
+  if(nd) nd.className="notif-dot"+(guest>0?" show":"");
+}
+
+function renderLive(){
+  const q=(document.getElementById("lq").value||"").toLowerCase();
+  const sf=document.getElementById("lsite").value||"";
+  const st=document.getElementById("lstatus").value||"";
+  const ciMap={};todayRecs.forEach(r=>ciMap[r.emp_name]=r);
+  let rows=EMP_DATA.filter(e=>{
+    if(q&&!e.name.toLowerCase().includes(q))return false;
+    if(sf&&!e.site.toLowerCase().includes(sf.toLowerCase()))return false;
+    const ci=ciMap[e.name];
+    if(st==="present"&&!(ci&&ci.status==="present"&&!ci.checkout_time))return false;
+    if(st==="absent"&&!(ci&&ci.status==="absent"))return false;
+    if(st==="done"&&!(ci&&ci.checkout_time))return false;
+    if(st==="late"&&!(ci&&(ci.is_late===true||ci.is_late==="TRUE")))return false;
+    if(st==="notin"&&ci)return false;
+    return true;
+  });
+  const grid=document.getElementById("lgrid");
+  if(!rows.length){grid.innerHTML='<div class="empty">No employees match filter</div>';return;}
+  grid.innerHTML=rows.map(e=>{
+    const ci=ciMap[e.name];
+    const isLate=ci&&(ci.is_late===true||ci.is_late==="TRUE");
+    let cls="a",avc="a",stxt="NOT IN";
+    if(ci?.checkout_time){cls="d";avc="d";stxt="DONE";}
+    else if(ci?.status==="present"&&isLate){cls="l";avc="l";stxt="LATE";}
+    else if(ci?.status==="present"){cls="p";avc="p";stxt="PRESENT";}
+    else if(ci?.status==="absent"){cls="a";avc="a";stxt="ABSENT";}
+    const isGuest=ci&&(ci.guest_location===true||ci.guest_location==="YES"||ci.guest_location==="true");
+    const init=e.name.trim().split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();
+    const pills=[
+      ci?`<span class="pill pt">In: ${ci.checkin_time||"--"}</span>`:"",
+      ci?.checkout_time?`<span class="pill pd">Out: ${ci.checkout_time}</span>`:"",
+      isLate?`<span class="pill pl">Late</span>`:"",
+      ci?.status==="present"&&!isGuest?`<span class="pill pg">&#10003; Zone</span>`:"",
+      isGuest?`<span class="pill" style="background:#FEF9C3;color:#92400E">⚠ Guest</span>`:"",
+      ci?.bonus?`<span class="pill pbon">Bonus &#8377;${ci.bonus}</span>`:"",
+    ].filter(Boolean).join("");
+    return`<div class="ec ${cls}">
+      <div class="echd"><div class="ava ${avc}">${init}</div>
+      <div><div class="ename">${e.name}</div><div class="esite">${e.site}</div></div>
+      <div class="estat e${cls}">${stxt}</div></div>
+      <div class="pills">${pills||'<span class="pill pn">Not checked in</span>'}</div>
+      <div style="margin-top:7px;display:flex;gap:5px">
+        <button onclick="quickMark('${e.name}','present')" style="flex:1;padding:4px;font-size:10px;border-radius:5px;border:none;background:var(--glt);color:var(--grn);font-weight:700;cursor:pointer">✓ P</button>
+        <button onclick="quickMark('${e.name}','absent')"  style="flex:1;padding:4px;font-size:10px;border-radius:5px;border:none;background:var(--rlt);color:var(--red);font-weight:700;cursor:pointer">✗ A</button>
+        <button onclick="openManualFor('${e.name}')" style="flex:1;padding:4px;font-size:10px;border-radius:5px;border:none;background:var(--blt);color:var(--blu);font-weight:700;cursor:pointer">&#128221;</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ── QUICK MARK ────────────────────────────────────────────
+async function quickMark(name, status){
+  const today=new Date().toISOString().split("T")[0];
+  const now=new Date();
+  const time=`${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+  try{
+    const r=await apiPost({action:"checkin",emp_name:name,site:EMP_DATA.find(e=>e.name===name)?.site||"",
+      checkin_time:time,gps:"Manual by Manager",status_override:status,
+      lat:null,lng:null,in_zone:status==="present",manual:true});
+    toast(`${name} marked ${status.toUpperCase()} ✓`,"ok");
+    await loadToday();updateMetrics();renderLive();renderSites();renderFeed();
+  }catch(e){toast("Error: "+e.message,"er");}
+}
+
+// ── MODAL ─────────────────────────────────────────────────
+function openModal(id){
+  // Populate employee dropdowns in modals
+  ["mat-emp","bon-emp"].forEach(sid=>{
+    const sel=document.getElementById(sid);
+    sel.innerHTML='<option value="">Select employee...</option>';
+    EMP_DATA.forEach(e=>{const o=document.createElement("option");o.value=e.name;o.textContent=e.name;sel.appendChild(o);});
+  });
+  // Set today's date in attendance modal
+  document.getElementById("mat-date").value=new Date().toISOString().split("T")[0];
+  // Set current month in bonus modal
+  const now=new Date();
+  document.getElementById("bon-month").value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+  document.getElementById("sync-month").value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+  // Reset sync modal state
+  document.getElementById("sync-preview").style.display="none";
+  document.getElementById("sync-empty").style.display="none";
+  document.getElementById("sync-result").style.display="none";
+  document.getElementById(id).classList.add("show");
+  selStatus("present");
+}
+function openManualFor(name){
+  openModal("att-modal");
+  setTimeout(()=>{document.getElementById("mat-emp").value=name;},50);
+}
+function closeModal(id){document.getElementById(id).classList.remove("show");}
+
+function selStatus(s){
+  selStatus_val=s;
+  ["present","absent","late"].forEach(st=>{
+    const btn=document.getElementById("sb-"+st);
+    btn.className="status-btn"+(s===st?" sel-"+s:"");
+  });
+}
+
+// ── MANUAL ATTENDANCE ─────────────────────────────────────
+async function submitManualAtt(){
+  const emp=document.getElementById("mat-emp").value;
+  const date=document.getElementById("mat-date").value;
+  const cin=document.getElementById("mat-cin").value;
+  const cout=document.getElementById("mat-cout").value;
+  const note=document.getElementById("mat-note").value;
+  if(!emp)return alert("Please select an employee");
+  if(!date)return alert("Please select a date");
+  try{
+    const r=await apiPost({
+      action:"checkin",emp_name:emp,
+      site:EMP_DATA.find(e=>e.name===emp)?.site||"",
+      checkin_time:cin,checkout_time:cout,
+      gps:"Manual entry by Manager",
+      status_override:selStatus_val,
+      is_late:selStatus_val==="late",
+      notes:"Manual: "+note,
+      manual:true,
+      date_override:date,
+      lat:null,lng:null
+    });
+    if(r.success||r.message){
+      toast(`${emp} — ${selStatus_val.toUpperCase()} saved for ${date} ✓`,"ok");
+      closeModal("att-modal");
+      await loadToday();updateMetrics();renderLive();
+    }else{toast(r.error||"Error saving","er");}
+  }catch(e){toast("Error: "+e.message,"er");}
+}
+
+// ── BONUS / DEDUCTION ─────────────────────────────────────
+async function submitBonus(){
+  const emp=document.getElementById("bon-emp").value;
+  const month=document.getElementById("bon-month").value;
+  const type=document.getElementById("bon-type").value;
+  const amt=parseFloat(document.getElementById("bon-amt").value);
+  const reason=document.getElementById("bon-reason").value;
+  if(!emp)return alert("Please select an employee");
+  if(!amt||amt<=0)return alert("Please enter a valid amount");
+  if(!reason)return alert("Please enter a reason");
+  try{
+    const r=await apiPost({action:"addBonus",emp_name:emp,month,type,amount:amt,reason});
+    if(r.success||r.message){
+      toast(`${type==="bonus"?"Bonus":"Deduction"} ₹${amt} saved for ${emp} ✓`,"ok");
+      closeModal("bon-modal");
+      document.getElementById("bon-amt").value="";
+      document.getElementById("bon-reason").value="";
+    }else{toast(r.error||"Error saving","er");}
+  }catch(e){toast("Error: "+e.message,"er");}
+}
+
+function renderSites(){
+  const sm={};
+  EMP_DATA.forEach(e=>{if(!sm[e.site])sm[e.site]={t:0,p:0};sm[e.site].t++;});
+  todayRecs.forEach(r=>{if(sm[r.site]&&r.status==="present")sm[r.site].p++;});
+  const sites=Object.entries(sm).sort((a,b)=>b[1].p-a[1].p);
+  document.getElementById("site-ov").innerHTML=sites.map(([s,d],i)=>`
+    <div class="srow"><div class="sdot" style="background:${COLORS[i%COLORS.length]}"></div>
+    <div class="sname">${s}</div><div class="snums">${d.p}/${d.t}</div>
+    <div class="spct" style="color:${d.p/d.t>.7?'var(--grn)':d.p/d.t>.4?'#b45309':'var(--red)'}">${Math.round(d.p/d.t*100)}%</div></div>`).join("");
+}
+
+function renderFeed(){
+  const recent=[...todayRecs].sort((a,b)=>(b.checkin_time||"").localeCompare(a.checkin_time||"")).slice(0,8);
+  document.getElementById("feed").innerHTML=recent.length?recent.map(r=>`
+    <div class="fitem"><div class="fdot ${r.status==="present"?"p":"a"}"></div>
+    <div><div style="font-size:11px;font-weight:700">${r.emp_name}</div>
+    <div style="font-size:10px;color:var(--g4)">${r.site||""} &middot; ${r.checkin_time||"--"}${r.is_late===true||r.is_late==="TRUE"?" &middot; LATE":""}${r.guest_location===true||r.guest_location==="YES"||r.guest_location==="true"?' &middot; <span style="color:#92400E;font-weight:800">GUEST ⚠</span>':""}</div></div></div>`).join("")
+    :'<div class="empty" style="padding:10px;font-size:11px">No check-ins yet</div>';
+}
+
+// ── GUEST LOCATION ALERTS ─────────────────────────────────
+// Dismissed alerts stored in memory so they don't reappear until refresh
+let dismissedGuests = new Set();
+
+function renderGuestAlerts(){
+  const guests = todayRecs.filter(r=>{
+    const isGuest = r.guest_location===true||r.guest_location==="YES"||r.guest_location==="true";
+    return isGuest && !dismissedGuests.has(r.emp_name);
+  });
+  const panel = document.getElementById("guest-panel");
+  const list  = document.getElementById("guest-list");
+  const badge = document.getElementById("guest-badge");
+  if(!guests.length){
+    panel.style.display="none";
+    return;
+  }
+  panel.style.display="block";
+  badge.textContent = guests.length;
+  list.innerHTML = guests.map(r=>{
+    const role = r.role||"employee";
+    const roleLabel = role==="candidate"?"Candidate":"Employee";
+    const roleBadge = role==="candidate"
+      ? `<span style="background:#F3E8FF;color:#7C3AED;padding:1px 6px;border-radius:8px;font-size:9px;font-weight:800">CANDIDATE</span>`
+      : `<span style="background:var(--blt);color:var(--blu);padding:1px 6px;border-radius:8px;font-size:9px;font-weight:800">EMPLOYEE</span>`;
+    const lat = r.lat||"";
+    const lng = r.lng||"";
+    const mapsUrl = (lat&&lng)
+      ? `https://maps.google.com/?q=${lat},${lng}`
+      : `https://maps.google.com/?q=${encodeURIComponent(r.gps_checkin||r.gps||"")}`;
+    const dist = r.distance_meters ? `${r.distance_meters}m from ${r.zone_name||"work zone"}` : "Outside work zone";
+    return `<div class="galert" id="galert-${r.emp_name.replace(/\s/g,'_')}">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+        <div class="galert-name">${r.emp_name}</div>${roleBadge}
+      </div>
+      <div class="galert-meta">
+        📍 ${dist}<br>
+        🕐 Check-in: ${r.checkin_time||"--"} &nbsp;|&nbsp; 🏢 ${r.site||"--"}<br>
+        ${r.gps_checkin||r.gps?"🌐 GPS: "+String(r.gps_checkin||r.gps).substring(0,30):""}
+      </div>
+      <div class="galert-btns">
+        <button class="ga-approve" onclick="approveGuest('${r.emp_name}','${r.site||""}','${r.checkin_time||""}')">✓ Mark Present</button>
+        <a class="ga-maps" href="${mapsUrl}" target="_blank">📍 Maps</a>
+        <button class="ga-dismiss" onclick="dismissGuest('${r.emp_name}')">✕</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+async function approveGuest(empName, site, ciTime){
+  try{
+    const today = new Date().toISOString().split("T")[0];
+    const r = await apiPost({
+      action:"checkin",
+      emp_name:empName,
+      site:site,
+      checkin_time:ciTime,
+      gps:"Manager approved guest location",
+      status_override:"present",
+      in_zone:true,
+      guest_location:false,  // clear guest flag — now officially approved as Present
+      manager_approved:true,
+      manual:false,
+      lat:null,lng:null,
+      date_override:today
+    });
+    if(r.success||r.message){
+      dismissedGuests.add(empName);
+      toast(`✓ ${empName} approved as PRESENT in Google Sheet`,"ok");
+      await loadToday();
+      updateMetrics();renderLive();renderSites();renderFeed();renderGuestAlerts();
+    }else{
+      toast(r.error||"Error approving","er");
+    }
+  }catch(e){
+    toast("Error: "+e.message,"er");
+  }
+}
+
+function dismissGuest(empName){
+  dismissedGuests.add(empName);
+  renderGuestAlerts();
+  toast(`${empName} alert dismissed`,"in");
+}
+
+let regData=[];
+async function loadAndRenderReg(){
+  try{const d=await apiGet({action:"getRegister"});regData=d;renderReg();}
+  catch(e){document.getElementById("rtbody").innerHTML=`<tr><td colspan="38" style="text-align:center;padding:20px;color:var(--g4)">Error: ${e.message}</td></tr>`;}
+}
+function calcReg(d){
+  let p=0,a=0,l=0;
+  Object.keys(d).filter(k=>k.startsWith("day")).forEach(k=>{
+    const v=d[k];if(!v||v==="WO"||v==="H"||v==="SD")return;
+    if(v==="L")l++;else if(["G","A","B","C","D","N","P"].some(c=>v.toUpperCase().includes(c)))p+=v.toUpperCase()==="HD"?.5:1;else a++;
+  });
+  const tot=p+a+l;return{p,a,l,pct:tot>0?Math.round(p/tot*100):0};
+}
+function renderReg(){
+  const q=(document.getElementById("rq").value||"").toLowerCase();
+  const sf=(document.getElementById("rsite").value||"").toLowerCase();
+  const rows=regData.filter(r=>(!q||r.emp_name.toLowerCase().includes(q))&&(!sf||r.site.toLowerCase().includes(sf)));
+  const ciMap={};todayRecs.forEach(r=>ciMap[r.emp_name]=r);
+  const todayDay=new Date().getDate()-1;
+  document.getElementById("rtbody").innerHTML=rows.map((r,idx)=>{
+    const s=calcReg(r);
+    const live=ciMap[r.emp_name];
+    const cells=Array.from({length:31},(_,i)=>{
+      let v=r["day"+(i+1)]||"";
+      if(live&&i===todayDay)v=live.status==="present"?"P":"A";
+      const u=v.toUpperCase();
+      const cl=!v?"":u==="WO"||u==="H"?"cw":u==="L"?"cl":["G","A","B","C","D","N","P"].some(c=>u.includes(c))?"cp":"ca";
+      return`<td class="${cl}">${v}</td>`;
+    }).join("");
+    const pc=s.pct>=80?"pph":s.pct>=60?"ppm":"ppl";
+    return`<tr><td>${idx+1}</td><td>${r.site}</td><td>${r.emp_name}</td>${cells}<td class="cp">${s.p}</td><td class="ca">${s.a}</td><td class="cl">${s.l}</td><td class="${pc}">${s.pct}%</td></tr>`;
+  }).join("");
+}
+function filterReg(){renderReg();}
+
+function renderAnalytics(){
+  const total=EMP_DATA.length;
+  const present=todayRecs.filter(r=>r.status==="present").length;
+  const late=todayRecs.filter(r=>r.is_late===true||r.is_late==="TRUE").length;
+  const done=todayRecs.filter(r=>r.checkout_time).length;
+  const notIn=total-todayRecs.length;
+  const sm={};
+  EMP_DATA.forEach(e=>{if(!sm[e.site])sm[e.site]={t:0,p:0};sm[e.site].t++;});
+  todayRecs.forEach(r=>{if(sm[r.site]&&r.status==="present")sm[r.site].p++;});
+  const sites=Object.entries(sm).sort((a,b)=>b[1].p-a[1].p);
+  document.getElementById("an-site").innerHTML=sites.length?sites.map(([s,d],i)=>`
+    <div class="brow"><div class="blbl">${s}</div>
+    <div class="btr"><div class="bfl" style="width:${d.t>0?Math.round(d.p/d.t*100):0}%;background:${COLORS[i%COLORS.length]}">${d.t>0&&d.p>0?Math.round(d.p/d.t*100)+"%" :""}</div></div>
+    <div class="bpct" style="color:${COLORS[i%COLORS.length]}">${d.t>0?Math.round(d.p/d.t*100):0}%</div></div>`).join("")
+    :'<div class="empty">No check-ins yet</div>';
+  document.getElementById("an-ov").innerHTML=`
+    <div class="brow"><div class="blbl" style="color:var(--grn)">Present</div><div class="btr"><div class="bfl" style="width:${Math.round(present/total*100)}%;background:var(--grn)">${Math.round(present/total*100)}%</div></div><div class="bpct" style="color:var(--grn)">${present}</div></div>
+    <div class="brow"><div class="blbl" style="color:var(--red)">Not In</div><div class="btr"><div class="bfl" style="width:${Math.round(notIn/total*100)}%;background:var(--red)">${Math.round(notIn/total*100)}%</div></div><div class="bpct" style="color:var(--red)">${notIn}</div></div>
+    <div class="brow"><div class="blbl" style="color:#b45309">Late</div><div class="btr"><div class="bfl" style="width:${Math.round(late/total*100)}%;background:var(--ylw)">${Math.round(late/total*100)}%</div></div><div class="bpct" style="color:#b45309">${late}</div></div>
+    <div class="snums">
+      <div class="sn"><div class="snv" style="color:var(--grn)">${Math.round(present/total*100)}%</div><div class="snl">Attendance</div></div>
+      <div class="sn"><div class="snv" style="color:var(--blu)">${done}</div><div class="snl">Completed</div></div>
+      <div class="sn"><div class="snv" style="color:var(--red)">${notIn}</div><div class="snl">Not In</div></div>
+    </div>`;
+  if(regData.length){
+    const sorted=[...regData].map(r=>({...r,...calcReg(r)})).sort((a,b)=>b.pct-a.pct);
+    document.getElementById("an-emp").innerHTML=sorted.map((e,i)=>`
+      <div style="display:flex;align-items:center;gap:9px;padding:9px 10px;background:var(--g1);border-radius:8px">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:${i===0?"#F5C100":i===1?"#C0C0C0":i===2?"#CD7F32":"var(--g3)"};width:22px;flex-shrink:0">${i+1}</div>
+        <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.emp_name}</div><div style="font-size:10px;color:var(--g4)">${e.site}</div></div>
+        <div style="font-size:14px;font-weight:800;color:${e.pct>=80?"var(--grn)":e.pct>=60?"#b45309":"var(--red)"}">${e.pct}%</div>
+      </div>`).join("");
+  }
+}
+
+// ── SYNC BONUS TO SALARY ──────────────────────────────────
+async function loadBonusPreview(){
+  const month=document.getElementById("sync-month").value;
+  if(!month){alert("Please select a month first");return;}
+  document.getElementById("sync-preview").style.display="none";
+  document.getElementById("sync-empty").style.display="none";
+  document.getElementById("sync-actions").style.display="none";
+  document.getElementById("sync-result").style.display="none";
+  try{
+    const res=await apiGet({action:"getBonusList",month});
+    if(!res.entries||res.entries.length===0){
+      document.getElementById("sync-empty").style.display="block";
+      return;
+    }
+    // Group by employee
+    const empMap={};
+    res.entries.forEach(e=>{
+      if(!empMap[e.emp_name])empMap[e.emp_name]={bonus:0,deduction:0,reasons:[]};
+      if(e.type.includes("BONUS"))empMap[e.emp_name].bonus+=e.amount;
+      else empMap[e.emp_name].deduction+=e.amount;
+      empMap[e.emp_name].reasons.push(e.reason);
+    });
+    let totalBonus=0,totalDed=0,html="";
+    Object.entries(empMap).forEach(([name,d])=>{
+      totalBonus+=d.bonus;totalDed+=d.deduction;
+      const net=d.bonus-d.deduction;
+      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border-bottom:0.5px solid var(--color-border-tertiary);font-size:13px">
+        <div>
+          <div style="font-weight:600;color:var(--color-text-primary)">${name}</div>
+          <div style="font-size:11px;color:var(--color-text-secondary)">${d.reasons.join(", ")}</div>
+        </div>
+        <div style="font-weight:700;font-size:14px;color:${net>=0?"#7C3AED":"#CC1F1F"}">${net>=0?"+":"-"} &#8377;${Math.abs(net).toLocaleString()}</div>
+      </div>`;
+    });
+    document.getElementById("sync-list").innerHTML=html;
+    document.getElementById("sync-summary").innerHTML=
+      `<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px">
+        <span style="color:var(--color-text-secondary)">Total Bonus</span>
+        <strong style="color:#7C3AED">+&#8377;${totalBonus.toLocaleString()}</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px">
+        <span style="color:var(--color-text-secondary)">Total Deductions</span>
+        <strong style="color:#CC1F1F">-&#8377;${totalDed.toLocaleString()}</strong>
+      </div>`;
+    document.getElementById("sync-preview").style.display="block";
+    document.getElementById("sync-actions").style.display="block";
+  }catch(e){alert("Error loading: "+e.message);}
+}
+
+async function applyBonusToSalary(){
+  const month=document.getElementById("sync-month").value;
+  if(!month)return;
+  const btn=document.getElementById("sync-apply-btn");
+  btn.disabled=true;btn.textContent="Applying...";
+  try{
+    const res=await apiPost({action:"syncBonus",month});
+    btn.disabled=false;btn.textContent="↺ APPLY BONUS TO MONTHLY SALARY";
+    if(res.success){
+      const r=document.getElementById("sync-result");
+      r.style.display="block";
+      r.innerHTML=`<strong>&#10003; Done!</strong><br><br>`+
+        `&#8226; Month: <strong>${month}</strong><br>`+
+        `&#8226; <strong>${res.updated} employees</strong> updated<br>`+
+        `&#8226; Total Bonus added: <strong>&#8377;${(res.total_bonus||0).toLocaleString()}</strong><br>`+
+        `&#8226; Total Deductions: <strong>&#8377;${(res.total_deduction||0).toLocaleString()}</strong><br><br>`+
+        `Now open your Google Sheet &#8594; <strong>Monthly_Salary</strong> tab &#8594; you will see a new <strong>"Bonus (&#8377;)"</strong> column next to Net Payable`;
+      toast("Bonus applied to Monthly Salary &#10003;","ok");
+    }else{
+      btn.disabled=false;
+      alert(res.error||"Error applying bonus");
+    }
+  }catch(e){
+    btn.disabled=false;btn.textContent="↺ APPLY BONUS TO MONTHLY SALARY";
+    alert("Error: "+e.message);
+  }
+}
+
+async function addEmp(){
+  const name=document.getElementById("add-n").value.trim();
+  const site=document.getElementById("add-s").value;
+  if(!name||!site)return toast("Enter name and site","er");
+  if(EMP_DATA.find(e=>e.name.toLowerCase()===name.toLowerCase()))return toast("Already exists","er");
+  try{
+    const r=await apiPost({action:"addEmployee",name,site});
+    if(r.success){EMP_DATA.push({name,site});toast(name+" added ✓","ok");document.getElementById("add-n").value="";renderLive();}
+    else toast(r.error||"Error","er");
+  }catch(e){toast("Error: "+e.message,"er");}
+}
+
+async function refreshAll(){
+  toast("Refreshing...","in");
+  const prevGuestCount = todayRecs.filter(r=>r.guest_location===true||r.guest_location==="YES"||r.guest_location==="true").length;
+  await loadToday();
+  updateMetrics();renderLive();renderSites();renderFeed();renderGuestAlerts();
+  // Check if new guest alerts appeared since last refresh
+  const newGuestCount = todayRecs.filter(r=>r.guest_location===true||r.guest_location==="YES"||r.guest_location==="true").length;
+  if(newGuestCount > prevGuestCount) showGuestPopup();
+  // Refresh live location tab if it's open
+  const locTab = document.getElementById("loc");
+  if(locTab && locTab.classList.contains("on")) renderLiveLocation();
+  toast(`Updated — ${todayRecs.length} check-ins today`,"ok");
+}
+
+// ── LIVE LOCATION TAB ─────────────────────────────────────
+function renderLiveLocation(){
+  const grid = document.getElementById("loc-grid");
+  const allBtn = document.getElementById("all-maps-btn");
+
+  // Only show employees who have GPS coordinates
+  const withGPS = todayRecs.filter(r => r.lat && r.lng);
+  const guests   = todayRecs.filter(r => r.guest_location===true||r.guest_location==="YES"||r.guest_location==="true");
+
+  // Build "View All on Map" link using Google Maps with multiple pins
+  if(withGPS.length > 0){
+    const pins = withGPS.map(r=>`${r.lat},${r.lng}`).join("|");
+    // Google Maps directions with multiple waypoints (up to 10 shown nicely)
+    const first = withGPS[0];
+    const mapsAll = `https://maps.google.com/maps?q=${first.lat},${first.lng}&markers=${withGPS.map(r=>`${r.lat},${r.lng}`).join("&markers=")}`;
+    allBtn.href = `https://www.google.com/maps/search/?api=1&query=${first.lat},${first.lng}`;
+    allBtn.style.display = "inline-flex";
+  }
+
+  // Guest alerts section inside location tab
+  const guestPanel = document.getElementById("loc-guest-panel");
+  const guestList  = document.getElementById("loc-guest-list");
+  if(guests.length > 0){
+    guestPanel.style.display = "block";
+    guestList.innerHTML = guests.map(r=>{
+      const lat=r.lat||"", lng=r.lng||"";
+      const mapsUrl = lat&&lng ? `https://maps.google.com/?q=${lat},${lng}` : "#";
+      const dist = r.distance_meters ? `${r.distance_meters}m from ${r.zone_name||"work zone"}` : "Outside work zone";
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#fff;border-radius:8px;margin-bottom:6px;border:0.5px solid #F5C100">
+        <div>
+          <div style="font-weight:700;font-size:13px">${r.emp_name}</div>
+          <div style="font-size:11px;color:var(--g4)">${r.site||""} · ${r.checkin_time||"--"} · ${dist}</div>
+        </div>
+        <a href="${mapsUrl}" target="_blank" style="padding:6px 10px;background:var(--blu);color:#fff;border-radius:7px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap">📍 Maps</a>
+      </div>`;
+    }).join("");
+  } else {
+    guestPanel.style.display = "none";
+  }
+
+  if(!withGPS.length){
+    grid.innerHTML = '<div class="empty">No employees with GPS location yet today.<br>GPS coordinates are saved when employees check in.</div>';
+    return;
+  }
+
+  // Sort: guests first, then by site
+  const sorted = [...todayRecs].sort((a,b)=>{
+    const ag = a.guest_location===true||a.guest_location==="YES"||a.guest_location==="true";
+    const bg = b.guest_location===true||b.guest_location==="YES"||b.guest_location==="true";
+    if(ag && !bg) return -1;
+    if(!ag && bg) return 1;
+    return (a.site||"").localeCompare(b.site||"");
+  });
+
+  grid.innerHTML = sorted.map(r=>{
+    const lat=r.lat||"", lng=r.lng||"";
+    if(!lat || !lng) return ""; // skip if no GPS
+    const mapsUrl = `https://maps.google.com/?q=${lat},${lng}`;
+    const staticMap = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=15&size=280x120&markers=color:red%7C${lat},${lng}&key=`;
+    const isGuest = r.guest_location===true||r.guest_location==="YES"||r.guest_location==="true";
+    const dist = r.distance_meters ? `${r.distance_meters}m from ${r.zone_name||"work zone"}` : "";
+    const borderColor = isGuest ? "#F5C100" : "#16a34a";
+    const statusBadge = isGuest
+      ? `<span style="background:#FEF9C3;color:#92400E;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800">⚠ GUEST</span>`
+      : `<span style="background:var(--glt);color:var(--grn);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800">✓ PRESENT</span>`;
+
+    return `<div style="background:var(--wh);border-radius:var(--r);box-shadow:0 2px 14px rgba(0,0,0,.07);border-left:4px solid ${borderColor};overflow:hidden">
+      <div style="padding:10px 12px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+          <div>
+            <div style="font-weight:700;font-size:13px">${r.emp_name}</div>
+            <div style="font-size:10px;color:var(--g4)">${r.site||""} · In: ${r.checkin_time||"--"}</div>
+          </div>
+          ${statusBadge}
+        </div>
+        ${dist ? `<div style="font-size:11px;color:#92400E;margin-bottom:6px">📍 ${dist}</div>` : ""}
+        <div style="font-size:11px;color:var(--g4);margin-bottom:8px;font-family:monospace">${lat}, ${lng}</div>
+        <a href="${mapsUrl}" target="_blank" style="display:block;text-align:center;padding:8px;background:var(--blu);color:#fff;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none">
+          📍 Open in Google Maps
+        </a>
+      </div>
+    </div>`;
+  }).filter(Boolean).join("");
+}
+
+// ── GUEST POPUP NOTIFICATION ──────────────────────────────
+let shownGuestPopupFor = new Set(); // track who we already showed popup for
+
+function showGuestPopup(){
+  const guests = todayRecs.filter(r=>{
+    const isGuest = r.guest_location===true||r.guest_location==="YES"||r.guest_location==="true";
+    return isGuest && !shownGuestPopupFor.has(r.emp_name);
+  });
+  if(!guests.length) return;
+
+  // Mark these as shown
+  guests.forEach(r => shownGuestPopupFor.add(r.emp_name));
+
+  const body = document.getElementById("guest-popup-body");
+  body.innerHTML = guests.map(r=>{
+    const lat=r.lat||"", lng=r.lng||"";
+    const mapsUrl = lat&&lng ? `https://maps.google.com/?q=${lat},${lng}` : "#";
+    const dist = r.distance_meters ? `${r.distance_meters}m from ${r.zone_name||"work zone"}` : "Outside work zone";
+    return `<div style="padding:8px 0;border-bottom:0.5px solid #f0e68c">
+      <div style="font-weight:700;font-size:13px;color:var(--g5)">${r.emp_name}</div>
+      <div style="font-size:11px;color:var(--g4);margin:2px 0">${r.site||""} · Checked in at ${r.checkin_time||"--"}</div>
+      <div style="font-size:11px;color:#92400E;margin:2px 0">📍 ${dist}</div>
+      <div style="display:flex;gap:6px;margin-top:7px">
+        <a href="${mapsUrl}" target="_blank" style="flex:1;padding:6px;text-align:center;background:var(--blu);color:#fff;border-radius:7px;font-size:11px;font-weight:700;text-decoration:none">📍 View on Maps</a>
+        <button onclick="approveGuest('${r.emp_name}','${r.site||""}','${r.checkin_time||""}')" style="flex:1;padding:6px;background:var(--glt);color:var(--grn);border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">✓ Approve Present</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  document.getElementById("guest-popup").style.display = "block";
+  // Auto-hide after 15 seconds
+  setTimeout(()=>{ document.getElementById("guest-popup").style.display="none"; }, 15000);
+}
+
+function closeGuestPopup(){
+  document.getElementById("guest-popup").style.display = "none";
+}
+
+
+function showLiveAlert(title, sub, type){
+  // Remove any existing live alert
+  const old = document.getElementById("live-alert");
+  if(old) old.remove();
+  const colors = {
+    ok:   {bg:"#DCFCE7", border:"#86EFAC", title:"#166534", sub:"#16a34a", dot:"#16a34a"},
+    warn: {bg:"#FFFBEB", border:"#F5C100", title:"#92400E", sub:"#b45309", dot:"#F5C100"},
+    info: {bg:"#DBEAFE", border:"#93C5FD", title:"#1D4ED8", sub:"#2563EB", dot:"#2563EB"},
+  };
+  const c = colors[type] || colors.ok;
+  const el = document.createElement("div");
+  el.id = "live-alert";
+  el.style.cssText = `position:fixed;top:70px;right:18px;z-index:400;width:290px;background:${c.bg};border:2px solid ${c.border};border-radius:13px;box-shadow:0 6px 28px rgba(0,0,0,.18);padding:13px 15px;animation:slideIn .35s ease;display:flex;align-items:flex-start;gap:10px`;
+  el.innerHTML = `
+    <div style="width:10px;height:10px;border-radius:50%;background:${c.dot};flex-shrink:0;margin-top:3px;animation:pulse .8s infinite alternate"></div>
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:800;color:${c.title};line-height:1.3">${title}</div>
+      <div style="font-size:11px;color:${c.sub};margin-top:3px">${sub}</div>
+    </div>
+    <button onclick="this.parentElement.remove()" style="background:none;border:none;font-size:16px;cursor:pointer;color:#aaa;line-height:1;padding:0 2px;flex-shrink:0">×</button>`;
+  document.body.appendChild(el);
+  setTimeout(()=>{ if(el.parentNode) el.remove(); }, 6000);
+}
+
+function toast(msg,type){
+  const el=document.getElementById("toast");
+  el.textContent=msg;el.className=`toast ${type} on`;
+  setTimeout(()=>el.classList.remove("on"),3500);
+}
+
+async function init(){
+  await loadToday();
+  updateMetrics();renderLive();renderSites();renderFeed();renderGuestAlerts();loadAndRenderReg();
+  // Show popup immediately if guests already checked in
+  showGuestPopup();
+
+  // ── CROSS-TAB LIVE UPDATES ─────────────────────────────────
+  // Listen for check-in / check-out events from Employee App (same browser)
+  window.addEventListener("storage", async function(e){
+    if(e.key !== "tp_live_event" || !e.newValue) return;
+    try{
+      const ev = JSON.parse(e.newValue);
+      const age = Date.now() - (ev.ts||0);
+      if(age > 10000) return; // ignore stale events > 10s
+      if(ev.type === "checkin"){
+        const badge = ev.isGuest ? "⚠ GUEST" : (ev.isLate ? "LATE" : "PRESENT");
+        showLiveAlert(`📲 ${ev.emp} just CHECKED IN`, `${ev.site} · ${ev.time} · ${badge}`, ev.isGuest?"warn":"ok");
+      } else if(ev.type === "checkout"){
+        showLiveAlert(`🌙 ${ev.emp} CHECKED OUT`, `${ev.time}${ev.hours>0?" · "+ev.hours+"h":""}`, "info");
+      }
+      // Auto-refresh data
+      await loadToday();
+      updateMetrics();renderLive();renderSites();renderFeed();renderGuestAlerts();
+      if(ev.type==="checkin" && ev.isGuest) showGuestPopup();
+    } catch(err){}
+  });
+
+  setInterval(async()=>{
+    const prevGuests = new Set(todayRecs.filter(r=>r.guest_location===true||r.guest_location==="YES"||r.guest_location==="true").map(r=>r.emp_name));
+    await loadToday();
+    updateMetrics();renderLive();renderSites();renderFeed();renderGuestAlerts();
+    // Show popup for any NEW guest that wasn't there before
+    const newGuests = todayRecs.filter(r=>{
+      const isGuest = r.guest_location===true||r.guest_location==="YES"||r.guest_location==="true";
+      return isGuest && !prevGuests.has(r.emp_name);
+    });
+    if(newGuests.length > 0) showGuestPopup();
+    // Refresh location tab if open
+    const locTab = document.getElementById("loc");
+    if(locTab && locTab.classList.contains("on")) renderLiveLocation();
+  },30000);
+}
+</script>
+</body>
+</html>
